@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Dashboard</title>
+  <style>
+    body {
+      background: url('https://picsum.photos/1200/804') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      color: white;
+    }
+    .container {
+      margin-top: 5%;
+      background: rgba(0,0,0,0.7);
+      padding: 40px;
+      border-radius: 15px;
+      display: inline-block;
+      width: 90%;
+    }
+    h1 { font-size: 40px; font-weight: bold; }
+    table { width: 100%; margin-top: 20px; color: white; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid gray; }
+    button, input { font-size: 16px; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome, {{ session.username }}!</h1>
+    <h2>Assignments</h2>
+
+    <table>
+      <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Your Work</th>
+        <th>Grade</th>
+      </tr>
+      {% for aid, a in assignments.items() %}
+        <tr>
+          <td>{{ a.title }}</td>
+          <td>{{ a.description }}</td>
+          <td>
+            {% if aid in student_subs %}
+              ✅ Submitted
+            {% else %}
+              ❌ Not Submitted
+            {% endif %}
+          </td>
+          <td>
+            {% if aid not in student_subs %}
+              <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="assignment_id" value="{{ aid }}">
+                <input type="file" name="file" required>
+                <button type="submit">Upload</button>
+              </form>
+            {% else %}
+              <a href="{{ url_for('download_file', filename=student_subs[aid].filename) }}">
+                {{ student_subs[aid].filename }}
+              </a>
+            {% endif %}
+          </td>
+          <td>
+            {% if aid in student_subs %}
+              {{ student_subs[aid].grade }}
+            {% else %}
+              Pending
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+
+    <br><a href="/logout">Logout</a>
+  </div>
+</body>
+</html>

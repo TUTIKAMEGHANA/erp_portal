@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Teacher Dashboard</title>
+  <style>
+    body {
+      background: url('https://picsum.photos/1200/805') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      color: white;
+    }
+    .container {
+      margin-top: 5%;
+      background: rgba(0,0,0,0.7);
+      padding: 40px;
+      border-radius: 15px;
+      display: inline-block;
+      width: 95%;
+    }
+    h1 { font-size: 40px; font-weight: bold; }
+    table { width: 100%; margin-top: 20px; color: white; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid gray; }
+    button, input { font-size: 16px; margin-top: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome, Teacher!</h1>
+
+    <h2>Create New Assignment</h2>
+    <form method="POST">
+      <input type="text" name="title" placeholder="Assignment Title" required>
+      <input type="text" name="description" placeholder="Description" required>
+      <button type="submit">Create</button>
+    </form>
+
+    <h2>Submissions</h2>
+    {% for aid, a in assignments.items() %}
+      <h3>{{ a.title }} - {{ a.description }}</h3>
+      <table>
+        <tr>
+          <th>Student</th>
+          <th>File</th>
+          <th>Current Grade</th>
+          <th>Grade Action</th>
+        </tr>
+        {% for student, subs in submissions.items() %}
+          {% if aid in subs %}
+            <tr>
+              <td>{{ student }}</td>
+              <td><a href="{{ url_for('download_file', filename=subs[aid].filename) }}">
+                {{ subs[aid].filename }}
+              </a></td>
+              <td>{{ subs[aid].grade }}</td>
+              <td>
+                <form method="POST">
+                  <input type="hidden" name="student" value="{{ student }}">
+                  <input type="hidden" name="assignment_id" value="{{ aid }}">
+                  <input type="text" name="grade" placeholder="Enter grade" required>
+                  <button type="submit">Update</button>
+                </form>
+              </td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </table>
+    {% endfor %}
+
+    <br><a href="/logout">Logout</a>
+  </div>
+</body>
+</html>
